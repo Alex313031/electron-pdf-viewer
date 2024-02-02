@@ -1,35 +1,43 @@
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FAlex313031%2Felectron-pdf-viewer.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FAlex313031%2Felectron-pdf-viewer?ref=badge_shield)
+![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/Alex313031/electron-pdf-viewer?label=Version%3A) &nbsp;![GitHub](https://img.shields.io/github/license/Alex313031/electron-pdf-viewer?color=green&label=License%3A) &nbsp;![GitHub commit activity](https://img.shields.io/github/commit-activity/w/Alex313031/electron-pdf-viewer?color=blueviolet&label=Commit%20Activity%3A) 
 
-<img src="https://github.com/Alex313031/electron-pdf-viewer/blob/master/Logo.png" width="40">&nbsp;&nbsp;Electron PDF Viewer
+<img src="https://github.com/Alex313031/electron-pdf-viewer/blob/master/Logo.png" width="48">&nbsp;&nbsp;Electron PDF Viewer
 ==========  
 
 PDF Viewer app created using [Electron](https://www.electronjs.org/) and [PDF.js](https://mozilla.github.io/pdf.js/).  
 <!-- Checkout a more versatile file viewer - https://github.com/praharshjain/Vudit-Desktop -->
 
-Usage
+Installation
 ----------------
 
-Download installers from [Releases](https://github.com/Alex313031/electron-pdf-viewer/releases)
+Download installers from the [Releases](https://github.com/Alex313031/electron-pdf-viewer/releases) section.
 
-Or build from source :
+Building
+----------------
 
-Install dependencies (Node.js, npm etc) :
+ - Requires NodeJS 14.x, 16.x, or 18.x. I recommend using <a href="https://github.com/nvm-sh/nvm">NVM</a>.  
+
+Install dependencies :
 ```
-$ sudo apt update
-$ sudo apt-get install build-essential python-software-properties
-$ nvm i # Requires NodeJS 14.x, 16.x, or 18.x. I reccomend using NVM.
+sudo apt update &&
+sudo apt install build-essential python3-software-properties
+nvm i
 ```
 
-To run :
+To build & run :
 ```
-$ git clone https://github.com/Alex313031/electron-pdf-viewer.git
-$ cd electron-pdf-viewer
-$ npm install && npm start
+git clone https://github.com/Alex313031/electron-pdf-viewer.git
+cd electron-pdf-viewer
+npm install && npm start
+```
+
+To generate installation packages :
+```
+npm run build && npm run dist
 ```
 
 Screenshot
 ----------------  
-<img src="https://github.com/Alex313031/electron-pdf-viewer/blob/master/screenshot.png" width="1024">
+<img src="https://github.com/Alex313031/electron-pdf-viewer/blob/master/screenshot.png" width="900">
   
 License
 ----------------
