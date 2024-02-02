@@ -37,7 +37,7 @@ npm run build && npm run dist
 
 Screenshot
 ----------------  
-<img src="https://github.com/Alex313031/electron-pdf-viewer/blob/master/screenshot.png" width="900">
+<img src="https://github.com/Alex313031/electron-pdf-viewer/blob/master/assets/screenshot.png" width="900">
   
 License
 ----------------

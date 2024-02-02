@@ -19,7 +19,8 @@
     "test": "npm run eslint ; npm run stylelint",
     "lint": "npm run eslint ; npm run stylelint",
     "eslint": "eslint \"app/**/*.js*\"",
-    "stylelint": "stylelint \"app/**/*.css*\""
+    "stylelint": "stylelint \"app/**/*.css*\"",
+    "postinstall": "electron-builder install-app-deps"
   },
   "repository": "https://github.com/Alex313031/electron-pdf-viewer",
   "keywords": [
