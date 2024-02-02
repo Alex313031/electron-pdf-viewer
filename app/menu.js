@@ -1,0 +1,325 @@
+const { Menu, shell, BrowserWindow, app, dialog } = require('electron');
+const config = require('./config');
+const path = require('path');
+const fs = require('fs');
+const electronLog = require('electron-log');
+const Store = require('electron-store');
+const options = { extraHeaders: 'pragma: no-cache\n' };
+const appIcon = config.iconPath;
+// Export app info
+const appName = app.getName();
+const appVersion = app.getVersion();
+const userDataDir = app.getPath('userData');
+const userLogFile = path.join(userDataDir, 'logs/main.log');
+
+module.exports = (store, mainWindow, app) => {
+
+  // Globally export what OS we are on
+  const isLinux = process.platform === 'linux';
+  const isWin = process.platform === 'win32';
+  const isMac = process.platform === 'darwin';
+
+  return Menu.buildFromTemplate([
+    {
+      label: config.appName,
+      role: 'appMenu',
+      submenu: [
+        {
+          label: 'Go Back',
+          accelerator: 'Alt+Left',
+          click(item, focusedWindow) {
+            if (focusedWindow) focusedWindow.webContents.goBack();
+            const currentURL = focusedWindow.webContents.getURL();
+            electronLog.info('Navigated backward to ' + [ currentURL ]);
+          }
+        },
+        {
+          label: 'Go Forward',
+          accelerator: 'Alt+Right',
+          click(item, focusedWindow) {
+            if (focusedWindow) focusedWindow.webContents.goForward();
+            const currentURL = focusedWindow.webContents.getURL();
+            electronLog.info('Navigated forward to ' + [ currentURL ]);
+          }
+        },
+        { type: 'separator' },
+        {
+          label: 'Quit ' + appName,
+          accelerator: 'CmdOrCtrl+Q',
+          role: 'quit'
+        }
+      ]
+    },
+    {
+      label: 'File',
+      submenu: [
+        {
+          label: 'Open File',
+          accelerator: 'CmdOrCtrl+O',
+          click: function (item, focusedWindow) {
+            if (focusedWindow) {
+              handleOpenFile();
+              electronLog.info('Opened file: ');
+            }
+          }
+        },
+        {
+          label: 'Open Containing Folder',
+          accelerator: 'CmdOrCtrl+F',
+          click: function (item, focusedWindow) {
+            if (focusedWindow && filepath) {
+              shell.showItemInFolder(filepath);
+              electronLog.info('Opened filepath in: ' + filepath);
+            }
+          }
+        },
+        {
+          label: 'Print',
+          accelerator: 'CmdOrCtrl+P',
+          click: function (item, focusedWindow) {
+            if (focusedWindow) focusedWindow.webContents.print();
+            electronLog.info('Opened Print dialog');
+          }
+        },
+        {
+          label: 'Close File',
+          accelerator: 'Shift+CmdOrCtrl+Z',
+          click: function (item, focusedWindow) {
+            if (focusedWindow) {
+              focusedWindow.loadURL('file://' + __dirname + '/index.html', options);
+              electronLog.info('Closed file: ');
+            }
+          }
+        }
+      ]
+    },
+    {
+      role: 'editMenu',
+      submenu: [
+        { role: 'undo' },
+        { role: 'redo' },
+        { type: 'separator' },
+        { role: 'cut' },
+        { role: 'copy' },
+        { role: 'paste' },
+        { role: 'pasteAndMatchStyle' },
+        { role: 'delete' },
+        { type: 'separator' },
+        { role: 'selectAll' }
+      ]
+    },
+    {
+      role: 'viewMenu',
+      submenu: [
+        {
+          label: 'Reload',
+          accelerator: 'CmdOrCtrl+R',
+          click(item, focusedWindow) {
+            if (focusedWindow) focusedWindow.webContents.reload();
+          }
+        },
+        {
+          label: 'Force Reload',
+          accelerator: 'CmdOrCtrl+Shift+R',
+          click(item, focusedWindow) {
+            if (focusedWindow) focusedWindow.webContents.reloadIgnoringCache();
+          }
+        },
+        {
+          label: 'Toggle Developer Tools',
+          accelerator: isMac ? 'Alt+Command+I' : 'Ctrl+Shift+I',
+          click(item, focusedWindow) {
+            const currentURL = focusedWindow.webContents.getURL();
+            electronLog.info('Toggling Developer Tools on ' + currentURL);
+            focusedWindow.webContents.toggleDevTools();
+          }
+        },
+        { type: 'separator' },
+        { role: 'resetZoom' },
+        { role: 'zoomIn' },
+        { role: 'zoomOut' },
+        { type: 'separator' },
+        { role: 'togglefullscreen' }
+      ]
+    },
+    {
+      label: 'Window',
+      role: 'windowMenu',
+      submenu: [
+        {
+          label: 'New Window',
+          accelerator: 'CmdorCtrl+N',
+          click() {
+            app.emit('new-window');
+          }
+        },
+        {
+          label: 'Minimize Window',
+          accelerator: 'CmdOrCtrl+M',
+          click(item, focusedWindow) {
+            if (focusedWindow) focusedWindow.minimize();
+            electronLog.info('Minimized a window');
+          }
+        },
+        {
+          label: 'Close Window',
+          accelerator: 'CmdorCtrl+W',
+          click(item, focusedWindow) {
+            if (focusedWindow) focusedWindow.close();
+            electronLog.info('Closed a Window');
+          }
+        }
+      ]
+    },
+    {
+      label: 'Developer',
+      submenu: [
+        {
+          label: 'Reload F5',
+          accelerator: 'F5',
+          visible: false,
+          acceleratorWorksWhenHidden: true,
+          click(item, focusedWindow) {
+            if (focusedWindow) focusedWindow.webContents.reload();
+          }
+        },
+        {
+          label: 'Open Log File',
+          click() {
+            electronLog.info('Opening ' + [ userLogFile ]);
+            const logWindow = new BrowserWindow({ width: 600, height: 768, useContentSize: true, title: userLogFile });
+            logWindow.loadFile(userLogFile);
+          }
+        },
+        {
+          label: 'Edit Config File',
+          click() {
+            electronLog.info('Editing Config File');
+            if (isLinux) {
+              electronLog.info('\n Note that JSON must be a recognized file type \n for the OS to open the config.json file.\n');
+              electronLog.info('\n On Linux, a default text editor for handling JSON files must also be present and configured correctly.\n');
+              store.openInEditor();
+              return;
+            } else {
+              electronLog.info('\n Note that JSON must be a recognized file type \n for the OS to open the config.json file.\n');
+              store.openInEditor();
+            }
+          }
+        },
+        {
+          label: 'Open User Data Dir',
+          click() {
+            electronLog.info('Opening ' + [ userDataDir ]);
+            shell.openPath(userDataDir);
+          }
+        },
+        { type: 'separator' },
+        {
+          label: 'Open Electron DevTools',
+          accelerator: isMac ? 'Cmd+Shift+F12' : 'F12',
+          click(item, focusedWindow) {
+            electronLog.info('Opening Electron DevTools on mainWindow.');
+            focusedWindow.openDevTools({ mode: 'detach' });
+          }
+        },
+        {
+          label: 'Open Electron DevTools Extra',
+          accelerator: 'Ctrl+Shift+F12',
+          visible: false,
+          acceleratorWorksWhenHidden: true,
+          click(item, focusedWindow) {
+            electronLog.info('Opening Electron DevTools on mainWindow.');
+            focusedWindow.openDevTools({ mode: 'detach' });
+          }
+        },
+        {
+          label: 'Open chrome://gpu',
+          accelerator: 'CmdorCtrl+Alt+G',
+          click() {
+            const gpuWindow = new BrowserWindow({ width: 900, height: 700, useContentSize: true, title: 'GPU Internals' });
+            gpuWindow.loadURL('chrome://gpu');
+            electronLog.info('Opened chrome://gpu');
+          }
+        },
+        {
+          label: 'Open chrome://process-internals',
+          accelerator: 'CmdorCtrl+Alt+P',
+          click() {
+            const procsWindow = new BrowserWindow({ width: 900, height: 700, useContentSize: true, title: 'Process Model Internals' });
+            procsWindow.loadURL('chrome://process-internals');
+            electronLog.info('Opened chrome://process-internals');
+          }
+        },
+        {
+          label: 'Open chrome://media-internals',
+          accelerator: 'CmdorCtrl+Alt+M',
+          click() {
+            const mediaWindow = new BrowserWindow({ width: 900, height: 700, useContentSize: true, title: 'Media Internals' });
+            mediaWindow.loadURL('chrome://media-internals');
+            electronLog.info('Opened chrome://media-internals');
+          }
+        },
+        {
+          label: 'Restart App',
+          click() {
+            app.emit('restart-confirm');
+          }
+        }
+      ]
+    },
+    {
+      label: 'About',
+      role: 'help',
+      submenu: [
+        {
+          label: 'Learn More',
+          click() {
+            new BrowserWindow({ width: 1024, height: 768, useContentSize: true }).loadURL('https://github.com/Alex313031/electron-pdf-viewer#readme');
+          }
+        },
+        {
+          label: 'About App',
+          accelerator: 'CmdorCtrl+Alt+A',
+          click() {
+            const aboutWindow = new BrowserWindow({
+              width: 512,
+              height: 500,
+              useContentSize: true,
+              autoHideMenuBar: true,
+              skipTaskbar: true,
+              darkTheme: true,
+              title: 'About ' + appName,
+              icon: isWin ? path.join(__dirname, 'icon.ico') : path.join(__dirname, 'icon64.png'),
+              webPreferences: {
+                nodeIntegration: false,
+                nodeIntegrationInWorker: false,
+                contextIsolation: false,
+                sandbox: false,
+                experimentalFeatures: true,
+                webviewTag: true,
+                devTools: true,
+                preload: path.join(__dirname, 'preload.js')
+              }
+            });
+            require('@electron/remote/main').enable(aboutWindow.webContents);
+            aboutWindow.loadURL('file://' + __dirname + '/about.html', options);
+            electronLog.info('Opened about.html');
+          }
+        },
+        //{
+        //  label: 'About',
+        //  click: function () {
+        //    dialog.showMessageBox(mainWindow, {
+        //      type: 'info',
+        //      buttons: ['OK'],
+        //      title: config.appName,
+        //      message: 'Version ' + config.appVersion,
+        //      detail: 'Created By - ' + config.author,
+        //      icon: appIcon
+        //    });
+        //  }
+        //}
+      ]
+    }
+  ]);
+};
