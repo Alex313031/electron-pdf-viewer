@@ -14,9 +14,9 @@ const menu = require('./menu.js');
 const store = new Store();
 const userDataDir = app.getPath('userData');
 let mainWindow;
-let splashwindow;
+let splashWindow;
 let trayMenu = null;
-let filepath = null;
+let filePath = null;
 
 // Get version info
 const appName = app.getName();
@@ -87,7 +87,7 @@ function forceSingleInstance() {
 }
 
 function showSplashWindow() {
-  splashwindow = new BrowserWindow({
+  splashWindow = new BrowserWindow({
     accessibleTitle: config.appName,
     title: config.appName,
     icon: appIcon,
@@ -100,13 +100,35 @@ function showSplashWindow() {
     skipTaskbar: true,
     frame: false
   });
-  splashwindow.setOverlayIcon(appIcon, config.appName);
-  splashwindow.loadURL('file://' + __dirname + '/splash.html', options);
+
+  splashWindow.on('close', () => {
+    if (splashWindow) {
+      store.set('splashWindowDetails', {
+        position: splashWindow.getPosition(),
+      });
+      electronLog.info('Saved splashWindowDetails.');
+    } else {
+      electronLog.error('Error: spashWindow was not defined while trying to save windowDetails.');
+    }
+  });
+
+  const splashWindowDetails = store.get('splashWindowDetails');
+  if (splashWindowDetails) {
+    splashWindow.setPosition(
+      splashWindowDetails.position[0],
+      splashWindowDetails.position[1]
+    );
+  } else {
+    splashWindow.setSize(400, 300);
+  }
+
+  splashWindow.setOverlayIcon(appIcon, config.appName);
+  splashWindow.loadURL('file://' + __dirname + '/splash.html', options);
 }
 
 function hideSplashWindow() {
-  splashwindow.close();
-  splashwindow = null;
+  splashWindow.close();
+  splashWindow = null;
 }
 
 function createMainWindow() {
@@ -139,22 +161,45 @@ function createMainWindow() {
   });
   mainWindow.setOverlayIcon(appIcon, config.appName);
   resetWindow(mainWindow);
-  mainWindow.on('close', function (e) {
+
+  mainWindow.on('close', () => {
     mainWindow.webContents.clearHistory();
+    if (mainWindow) {
+      store.set('windowDetails', {
+        position: mainWindow.getPosition(),
+        size: mainWindow.getSize()
+      });
+      electronLog.info('Saved windowDetails.');
+    } else {
+      electronLog.error('Error: mainWindow was not defined while trying to save windowDetails.');
+    }
     mainWindow.webContents.session.clearCache(function () {
         mainWindow.destroy();
     });
   });
-  mainWindow.on('closed', function () {
+
+  const windowDetails = store.get('windowDetails');
+  if (windowDetails) {
+    mainWindow.setSize(
+      windowDetails.size[0],
+      windowDetails.size[1]
+    );
+    mainWindow.setPosition(
+      windowDetails.position[0],
+      windowDetails.position[1]
+    );
+  } else {
+    mainWindow.setSize(1024, 800);
+  }
+
+  mainWindow.on('closed', () => {
     mainWindow = null;
     app.quit();
   });
-  //mainWindow.webContents.on('new-window', function (e, url) {
-  //    e.preventDefault();
-  //    shell.openExternal(url);
-  //});
+
   mainWindow.loadURL('file://' + __dirname + '/index.html', options);
   require('@electron/remote/main').enable(mainWindow.webContents);
+
   mainWindow.once('ready-to-show', () => {
     hideSplashWindow();
     mainWindow.show();
@@ -222,16 +267,27 @@ contextMenu({
   }]
 });
 
+app.on('handle-open-file-path', () => {
+  shell.showItemInFolder(filePath);
+  electronLog.info('Opened containing filepath of: ' + filePath);
+});
+
+app.on('handle-open-file', () => {
+  handleOpenFile();
+});
+
 function handleOpenFile() {
   let path = dialog.showOpenDialogSync({
     filters: [{ name: 'PDF', extensions: ['pdf'] }],
     properties: ['openFile']
   });
   if (path) {
-    if (path.constructor === Array)
+    if (path.constructor === Array) {
       path = path[0];
-      filepath = path;
-      mainWindow.loadURL('file://' + __dirname + '/pdfviewer/web/viewer.html?file=' + encodeURIComponent(filepath), options);
+      filePath = path;
+      mainWindow.loadURL('file://' + __dirname + '/pdfviewer/web/viewer.html?file=' + encodeURIComponent(filePath), options);
+      electronLog.info('Opened file: ' + filePath);
+    }
   }
 }
 
@@ -240,6 +296,20 @@ const trayMenuTemplate = [
   { type: 'separator' },
   { label: 'Exit', type: 'radio', role: 'quit' },
 ]
+
+// Append some Chromium command-line switches for GPU acceleration and other features
+app.commandLine.appendSwitch('enable-local-file-accesses');
+app.commandLine.appendSwitch('enable-quic');
+app.commandLine.appendSwitch('enable-ui-devtools');
+app.commandLine.appendSwitch('ignore-gpu-blocklist');
+app.commandLine.appendSwitch('enable-gpu-rasterization');
+app.commandLine.appendSwitch('enable-features', 'CSSColorSchemeUARendering,ImpulseScrollAnimations,ParallelDownloading,Portals,StorageBuckets,JXL');
+// Enable remote debugging only if we in development mode
+if (process.env.NODE_ENV === 'development') {
+  const portNumber = '9222'
+  app.commandLine.appendSwitch('remote-debugging-port', portNumber);
+  electronLog.warn('Remote debugging open on port ' + [ portNumber ]);
+}
 
 // Fire it up
 app.whenReady().then(async() => {
@@ -312,27 +382,13 @@ app.on('will-quit', () => {
   electronLog.warn(appName + ' is quitting now');
 });
 
-app.on('activate', function () {
+app.on('activate', () => {
   // On MacOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (mainWindow === null) {
     createMainWindow();
   }
 });
-
-// Append some Chromium command-line switches for GPU acceleration and other features
-app.commandLine.appendSwitch('enable-local-file-accesses');
-app.commandLine.appendSwitch('enable-quic');
-app.commandLine.appendSwitch('enable-ui-devtools');
-app.commandLine.appendSwitch('ignore-gpu-blocklist');
-app.commandLine.appendSwitch('enable-gpu-rasterization');
-app.commandLine.appendSwitch('enable-features', 'CSSColorSchemeUARendering,ImpulseScrollAnimations,ParallelDownloading,Portals,StorageBuckets,JXL');
-// Enable remote debugging only if we in development mode
-if (process.env.NODE_ENV === 'development') {
-  const portNumber = '9222'
-  app.commandLine.appendSwitch('remote-debugging-port', portNumber);
-  electronLog.warn('Remote debugging open on port ' + [ portNumber ]);
-}
 
 // Called on disallowed remote APIs below
 function rejectEvent(event) {

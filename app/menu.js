@@ -22,7 +22,7 @@ module.exports = (store, mainWindow, app) => {
   return Menu.buildFromTemplate([
     {
       label: config.appName,
-      role: 'appMenu',
+      role: 'fileMenu',
       submenu: [
         {
           label: 'Go Back',
@@ -44,39 +44,27 @@ module.exports = (store, mainWindow, app) => {
         },
         { type: 'separator' },
         {
-          label: 'Quit ' + appName,
-          accelerator: 'CmdOrCtrl+Q',
-          role: 'quit'
-        }
-      ]
-    },
-    {
-      label: 'File',
-      submenu: [
-        {
           label: 'Open File',
           accelerator: 'CmdOrCtrl+O',
-          click: function (item, focusedWindow) {
+          click(item, focusedWindow) {
             if (focusedWindow) {
-              handleOpenFile();
-              electronLog.info('Opened file: ');
+              app.emit('handle-open-file');
             }
           }
         },
         {
           label: 'Open Containing Folder',
           accelerator: 'CmdOrCtrl+F',
-          click: function (item, focusedWindow) {
-            if (focusedWindow && filepath) {
-              shell.showItemInFolder(filepath);
-              electronLog.info('Opened filepath in: ' + filepath);
+          click(item, focusedWindow) {
+            if (focusedWindow) {
+              app.emit('handle-open-file-path');
             }
           }
         },
         {
           label: 'Print',
           accelerator: 'CmdOrCtrl+P',
-          click: function (item, focusedWindow) {
+          click(item, focusedWindow) {
             if (focusedWindow) focusedWindow.webContents.print();
             electronLog.info('Opened Print dialog');
           }
@@ -84,12 +72,18 @@ module.exports = (store, mainWindow, app) => {
         {
           label: 'Close File',
           accelerator: 'Shift+CmdOrCtrl+Z',
-          click: function (item, focusedWindow) {
+          click(item, focusedWindow) {
             if (focusedWindow) {
               focusedWindow.loadURL('file://' + __dirname + '/index.html', options);
               electronLog.info('Closed file: ');
             }
           }
+        },
+        { type: 'separator' },
+        {
+          label: 'Quit ' + appName,
+          accelerator: 'CmdOrCtrl+Q',
+          role: 'quit'
         }
       ]
     },
@@ -278,12 +272,27 @@ module.exports = (store, mainWindow, app) => {
           }
         },
         {
+          label: 'View License',
+          accelerator: 'CmdorCtrl+Alt+Shift+L',
+          click() {
+            const licenseWindow = new BrowserWindow({
+              width: 532,
+              height: 550,
+              useContentSize: true,
+              autoHideMenuBar: true,
+              title: 'License'
+            });
+            licenseWindow.loadURL('file://' + __dirname + '/license.md', options);
+            electronLog.info('Opened license.md');
+          }
+        },
+        {
           label: 'About App',
           accelerator: 'CmdorCtrl+Alt+A',
           click() {
             const aboutWindow = new BrowserWindow({
-              width: 512,
-              height: 500,
+              width: 500,
+              height: 400,
               useContentSize: true,
               autoHideMenuBar: true,
               skipTaskbar: true,

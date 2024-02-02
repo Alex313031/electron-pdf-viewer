@@ -1,94 +1,40 @@
 html {
   font-family: Roboto, sans-serif;
 }
-@media (prefers-color-scheme: light) {
-  :root {
-    --bgcolor: rgba(232, 232, 232, 96%);
-    --bold: rgba(232, 232, 232, 96%);
-    --invert: #262626;
-    --textcolor: #000;
-    --border: #262626;
-    --linkcolor: #00e;
-    --visitedcolor: #551a8b;
-    --service-hover: rgba(0, 0, 0, 0.1);
-    --service-active: rgba(32, 32, 32, 0.2);
-    --service-shadow: rgba(0, 0, 0, 0.3);
-    --h3-select: #0E7EEA;
-  }
-}
-:root.light {
-  --bgcolor: rgba(232, 232, 232, 96%);
-  --bold: rgba(232, 232, 232, 96%);
-  --invert: #262626;
-  --textcolor: #000;
-  --border: #262626;
-  --linkcolor: #00e;
-  --visitedcolor: #551a8b;
-  --service-hover: rgba(0, 0, 0, 0.1);
-  --service-active: rgba(32, 32, 32, 0.2);
-  --service-shadow: rgba(0, 0, 0, 0.3);
-  --h3-select: #0E7EEA;
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bgcolor: #262626;
-    --bold: #000000;
-    --invert: rgba(232, 232, 232, 96%);
-    --textcolor: #fff;
-    --border: rgba(128, 128, 128, 96%);
-    --linkcolor: #5bf5bf;
-    --visitedcolor: #ae5ee0;
-    --service-hover: rgba(100, 100, 100, 0.1);
-    --service-active: rgba(132, 132, 132, 0.1);
-    --service-shadow: rgba(0, 0, 0, 0.4);
-    --h3-select: #8AB4F8;
-  }
-}
-:root.dark {
-  --bgcolor: #262626;
-  --bold: #000000;
-  --invert: rgba(232, 232, 232, 96%);
-  --textcolor: #fff;
-  --border: rgba(128, 128, 128, 96%);
-  --linkcolor: #5bf5bf;
-  --visitedcolor: #ae5ee0;
-  --service-hover: rgba(100, 100, 100, 0.1);
-  --service-active: rgba(132, 132, 132, 0.1);
-  --service-shadow: rgba(0, 0, 0, 0.4);
-  --h3-select: #8AB4F8;
-}
+
 * {
   box-sizing: border-box;
 }
+
 hr {
-  background-color: var(--invert);
+  background-color: #262626;
   height: 2px;
   border: none;
 }
+
 body {
   max-width: 85%;
   height: auto;
   margin: auto;
-  color: var(--textcolor);
-  background-color: var(--bgcolor);
+  background-color: #ddd;
   font-family: Roboto, sans-serif;
 }
-h1 {
-  text-align: center;
-  text-shadow: 1px 1px 1px var(--bold);
-}
+
+h1,
 h2 {
   text-align: center;
 }
+
 .center {
   width: 100%;
   text-align: center;
-  align-content: center;
 }
+
 a:link {
-  color: var(--linkcolor);
+  color: #00e;
 }
+
 a:visited,
 a:active {
-  color: var(--visitedcolor);
+  color: #551a8b;
 }

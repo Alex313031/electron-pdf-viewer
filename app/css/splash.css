@@ -1,3 +1,26 @@
+html {
+  font-family: Roboto, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: auto;
+  background-color: #ddd;
+  font-family: Roboto, sans-serif;
+}
+
+h2 {
+  text-align: center;
+}
+
+.center {
+  text-align: center;
+  margin: 50px 0 0 0;
+}
+
 @keyframes shadowSpin {
   0% {
     box-shadow: 10px -10px #39CCCC, -10px 10px #FFDC00;

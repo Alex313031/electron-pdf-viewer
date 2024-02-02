@@ -2,7 +2,7 @@
   "name": "electron-pdf-viewer",
   "productName": "Electron PDF Viewer",
   "applicationId": "com.alex313031.electron-pdf-viewer",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A PDF viewer built with Electron",
   "main": "./app/main.js",
   "engines": {
@@ -16,6 +16,7 @@
     "clean": "rimraf dist/ && rimraf test/ && rimraf app/node_modules/ && rimraf node_modules/",
     "burn": "rimraf package-lock.json && rimraf app/package-lock.json",
     "test": "npm run eslint ; npm run stylelint",
+    "dev": "cross-env NODE_ENV=development ELECTRON_ENABLE_LOGGING=1 electron --enable-logging=file --user-data-dir=./test ./app",
     "lint": "npm run eslint ; npm run stylelint",
     "eslint": "eslint \"app/**/*.js*\"",
     "stylelint": "stylelint \"app/**/*.css*\""
