@@ -13,7 +13,8 @@ const argsCmd = process.argv; // Global cmdline object.
 const menu = require('./menu.js');
 const store = new Store();
 const userDataDir = app.getPath('userData');
-let mainWindow, splashwindow;
+let mainWindow;
+let splashwindow;
 let trayMenu = null;
 let filepath = null;
 
@@ -50,7 +51,7 @@ app.setAboutPanelOptions({
 crashReporter.start({
   productName: config.appName,
   companyName: config.author,
-  submitURL: config.website,
+  uploadToServer: false,
   autoSubmit: false
 });
 forceSingleInstance();
@@ -89,7 +90,7 @@ function showSplashWindow() {
   splashwindow = new BrowserWindow({
     accessibleTitle: config.appName,
     title: config.appName,
-    icon: config.appIcon,
+    icon: appIcon,
     width: 400,
     height: 300,
     //center: true,

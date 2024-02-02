@@ -14,5 +14,5 @@ module.exports = {
   author: data.author,
   website: data.website,
   iconPath: isWin ? path.join(__dirname, 'icon.ico') : path.join(__dirname, 'icon64.png'),
-  trayIconPath: isWin ? path.join(__dirname, 'icon.ico') : path.join(__dirname, 'icon64.png')
+  trayIconPath: isWin ? path.join(__dirname, 'icon.ico') : path.join(__dirname, 'icon32.png')
 }
