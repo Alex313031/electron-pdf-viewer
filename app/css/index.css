@@ -14,6 +14,11 @@ body {
 
 h2 {
   text-align: center;
+  color: #262626;
+}
+
+img.shadow {
+  filter: drop-shadow(1px 1px 1px #262626);
 }
 
 .outer {
@@ -42,7 +47,7 @@ h2 {
 }
 
 ::-webkit-scrollbar-thumb {
-  border-radius: 0px;
+  border-radius: 0;
   height: 8px;
   width: 8px;
   background-color: #666;

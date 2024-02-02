@@ -6,6 +6,12 @@ html {
   box-sizing: border-box;
 }
 
+hr {
+  background-color: #262626;
+  height: 2px;
+  border: none;
+}
+
 body {
   margin: auto;
   background-color: #ddd;
@@ -14,6 +20,11 @@ body {
 
 h2 {
   text-align: center;
+  color: #262626;
+}
+
+img.shadow {
+  filter: drop-shadow(1px 1px 1px #262626);
 }
 
 .center {
@@ -21,7 +32,7 @@ h2 {
   margin: 50px 0 0 0;
 }
 
-@keyframes shadowSpin {
+@keyframes shadow-Spin {
   0% {
     box-shadow: 10px -10px #39CCCC, -10px 10px #FFDC00;
   }
@@ -44,5 +55,5 @@ h2 {
   width: 1px;
   margin: 50px auto 0 auto;
   border: 5px solid #FF4136;
-  animation: shadowSpin 1s ease-in-out infinite;
+  animation: shadow-Spin 1s ease-in-out infinite;
 }

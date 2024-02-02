@@ -10,13 +10,13 @@
   },
   "scripts": {
     "start": "electron .",
+    "dev": "cross-env NODE_ENV=development ELECTRON_ENABLE_LOGGING=1 electron --enable-logging=file --user-data-dir=./test ./app",
     "build": "electron-builder --dir",
     "dist": "electron-builder",
     "distclean": "rimraf dist",
     "clean": "rimraf dist/ && rimraf test/ && rimraf app/node_modules/ && rimraf node_modules/",
     "burn": "rimraf package-lock.json && rimraf app/package-lock.json",
     "test": "npm run eslint ; npm run stylelint",
-    "dev": "cross-env NODE_ENV=development ELECTRON_ENABLE_LOGGING=1 electron --enable-logging=file --user-data-dir=./test ./app",
     "lint": "npm run eslint ; npm run stylelint",
     "eslint": "eslint \"app/**/*.js*\"",
     "stylelint": "stylelint \"app/**/*.css*\""
@@ -36,21 +36,22 @@
   },
   "license": "MIT",
   "copyright": "Copyright © 2024 Alex313031",
+  "dependencies": {
+    "@electron/remote": "2.1.2",
+    "electron-context-menu": "3.6.1",
+    "electron-log": "5.1.0",
+    "electron-store": "8.1.0"
+  },
   "devDependencies": {
     "asar": "3.2.0",
     "cross-env": "7.0.3",
     "electron": "22.3.27",
     "electron-builder": "23.6.0",
     "eslint": "8.44.0",
+    "rimraf": "3.0.2",
     "minimist": "1.2.8",
     "normalize-url": "8.0.0",
     "stylelint": "14.16.1",
     "stylelint-config-standard": "29.0.0"
-  },
-  "dependencies": {
-    "@electron/remote": "2.1.2",
-    "electron-context-menu": "3.6.1",
-    "electron-log": "5.1.0",
-    "electron-store": "8.1.0"
   }
 }

@@ -1,14 +1,10 @@
-const { Menu, shell, BrowserWindow, app, dialog } = require('electron');
+const { Menu, shell, BrowserWindow, app } = require('electron');
 const config = require('./config');
 const path = require('path');
-const fs = require('fs');
 const electronLog = require('electron-log');
-const Store = require('electron-store');
 const options = { extraHeaders: 'pragma: no-cache\n' };
-const appIcon = config.iconPath;
 // Export app info
 const appName = app.getName();
-const appVersion = app.getVersion();
 const userDataDir = app.getPath('userData');
 const userLogFile = path.join(userDataDir, 'logs/main.log');
 
@@ -256,7 +252,7 @@ module.exports = (store, mainWindow, app) => {
         {
           label: 'Restart App',
           click() {
-            app.emit('restart-confirm');
+            app.emit('restart');
           }
         }
       ]
@@ -273,7 +269,7 @@ module.exports = (store, mainWindow, app) => {
         },
         {
           label: 'View License',
-          accelerator: 'CmdorCtrl+Alt+Shift+L',
+          accelerator: 'CmdorCtrl+Alt+L',
           click() {
             const licenseWindow = new BrowserWindow({
               width: 532,
@@ -292,7 +288,7 @@ module.exports = (store, mainWindow, app) => {
           click() {
             const aboutWindow = new BrowserWindow({
               width: 500,
-              height: 400,
+              height: 420,
               useContentSize: true,
               autoHideMenuBar: true,
               skipTaskbar: true,

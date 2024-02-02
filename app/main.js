@@ -1,6 +1,4 @@
-const fs = require('fs');
-const path = require('path');
-const { app, session, BrowserWindow, crashReporter, nativeTheme, nativeImage, Menu, Tray, shell, dialog } = require('electron');
+const { app, BrowserWindow, crashReporter, Menu, Tray, shell, dialog } = require('electron');
 const config = require('./config');
 const contextMenu = require('electron-context-menu');
 const electronLog = require('electron-log');
@@ -8,11 +6,9 @@ const Store = require('electron-store');
 const options = { extraHeaders: 'pragma: no-cache\n' };
 const appIcon = config.iconPath;
 const trayIcon = config.trayIconPath;
-const argsCmd = process.argv; // Global cmdline object.
-// const argsCmd2 = process.argv[2]; // (2nd) Global cmdline object.
+const argsCmd = process.argv;
 const menu = require('./menu.js');
 const store = new Store();
-const userDataDir = app.getPath('userData');
 let mainWindow;
 let splashWindow;
 let trayMenu = null;
@@ -26,30 +22,25 @@ const chromeVer = process.versions.chrome;
 const nodeVer = process.versions.node;
 const v8Ver = process.versions.v8;
 
-// Globally export what OS we are on
-const isLinux = process.platform === 'linux';
-const isWin = process.platform === 'win32';
-const isMac = process.platform === 'darwin';
-
 // Initialize Electron remote module
 require('@electron/remote/main').initialize();
 
 // Restrict main.log size to 100Kb
 electronLog.transports.file.maxSize = 1024 * 100;
 
-app.setName(config.appName);
+app.setName(appName);
 app.setAboutPanelOptions({
-  applicationName: config.appName,
-  applicationVersion: config.appVersion,
+  applicationName: appName,
+  applicationVersion: appVersion,
   copyright: config.copyrightInfo,
-  version: config.appVersion,
+  version: appVersion,
   credits: config.author,
   authors: [config.author],
   website: config.website,
   iconPath: config.iconPath
 });
 crashReporter.start({
-  productName: config.appName,
+  productName: appName,
   companyName: config.author,
   uploadToServer: false,
   autoSubmit: false
@@ -74,7 +65,7 @@ function forceSingleInstance() {
   if (!app.requestSingleInstanceLock()) {
     app.quit();
   } else {
-    app.on('second-instance', (event, commandLine, workingDirectory) => {
+    app.on('second-instance', () => {
       // If someone tried to run a second instance, we should focus our window.
       if (mainWindow) {
         if (mainWindow.isMinimized()) {
@@ -88,8 +79,8 @@ function forceSingleInstance() {
 
 function showSplashWindow() {
   splashWindow = new BrowserWindow({
-    accessibleTitle: config.appName,
-    title: config.appName,
+    accessibleTitle: appName,
+    title: appName,
     icon: appIcon,
     width: 400,
     height: 300,
@@ -122,7 +113,7 @@ function showSplashWindow() {
     splashWindow.setSize(400, 300);
   }
 
-  splashWindow.setOverlayIcon(appIcon, config.appName);
+  splashWindow.setOverlayIcon(appIcon, appName);
   splashWindow.loadURL('file://' + __dirname + '/splash.html', options);
 }
 
@@ -134,8 +125,8 @@ function hideSplashWindow() {
 function createMainWindow() {
   // Create the main window.
   mainWindow = new BrowserWindow({
-    accessibleTitle: config.appName,
-    title: config.appName,
+    accessibleTitle: appName,
+    title: appName,
     icon: appIcon,
     resizable: true,
     maximizable: true,
@@ -159,7 +150,7 @@ function createMainWindow() {
       defaultEncoding: 'UTF-8'
     }
   });
-  mainWindow.setOverlayIcon(appIcon, config.appName);
+  mainWindow.setOverlayIcon(appIcon, appName);
   resetWindow(mainWindow);
 
   mainWindow.on('close', () => {
@@ -174,7 +165,7 @@ function createMainWindow() {
       electronLog.error('Error: mainWindow was not defined while trying to save windowDetails.');
     }
     mainWindow.webContents.session.clearCache(function () {
-        mainWindow.destroy();
+      mainWindow.destroy();
     });
   });
 
@@ -291,12 +282,6 @@ function handleOpenFile() {
   }
 }
 
-const trayMenuTemplate = [
-  { label: 'Minimize', type: 'radio', role: 'minimize' },
-  { type: 'separator' },
-  { label: 'Exit', type: 'radio', role: 'quit' },
-]
-
 // Append some Chromium command-line switches for GPU acceleration and other features
 app.commandLine.appendSwitch('enable-local-file-accesses');
 app.commandLine.appendSwitch('enable-quic');
@@ -311,64 +296,66 @@ if (process.env.NODE_ENV === 'development') {
   electronLog.warn('Remote debugging open on port ' + [ portNumber ]);
 }
 
+const trayMenuTemplate = [
+  { label: 'Minimize',
+    type: 'radio',
+    role: 'minimize',
+    click(item) {
+      mainWindow.minimize();
+      electronLog.info('Minimized mainWindow');
+    }
+  },
+  { label: 'Restore',
+    type: 'radio',
+    role: 'restore',
+    click(item) {
+      mainWindow.restore();
+      electronLog.info('Restored mainWindow');
+    }
+  },
+  { type: 'separator' },
+  { label: 'Exit',
+    type: 'radio',
+    role: 'quit'
+  }
+]
+
 // Fire it up
 app.whenReady().then(async() => {
-  showSplashWindow();
-  electronLog.info('Welcome to ' + appName);
-  let tray = new Tray(trayIcon);
-  trayMenu = Menu.buildFromTemplate(trayMenuTemplate);
-  tray.setToolTip(config.appName);
-  tray.setContextMenu(trayMenu);
-  Menu.setApplicationMenu(menu(store, mainWindow, app));
-  // for MacOS
-  if (app.dock) {
-    app.dock.setIcon(appIcon);
-    app.dock.setMenu(trayMenu);
+  // Show versions
+  if (argsCmd.includes('--version') || argsCmd.includes('-v')) {
+    console.log('\n  ' + appName + ' Version: ' + appVersion);
+    console.log('  Electron Version: ' + electronVer);
+    console.log('  Chromium Version: ' + chromeVer);
+    console.log('  NodeJS Version: ' + nodeVer);
+    console.log('  V8 Version: ' + v8Ver + '\n');
+    app.quit();
+  } else {
+    electronLog.info('Welcome to ' + appName);
+    showSplashWindow();
+    let tray = new Tray(trayIcon);
+    trayMenu = Menu.buildFromTemplate(trayMenuTemplate);
+    tray.setToolTip(appName);
+    tray.setContextMenu(trayMenu);
+    Menu.setApplicationMenu(menu(store, mainWindow, app));
+    // for MacOS
+    if (app.dock) {
+      app.dock.setIcon(appIcon);
+      app.dock.setMenu(trayMenu);
+    }
+    // hide splash screen randomly after ~1.2 seconds
+    setTimeout(createMainWindow, (Math.random() + 2) * 600);
   }
-  // hide splash screen randomly after ~1.2 seconds
-  setTimeout(createMainWindow, (Math.random() + 2) * 600);
 });
 
 // Full restart, quitting Electron. Triggered by developer menu
 app.on('restart', () => {
   electronLog.warn('Restarting Electron...');
 
-  store.set('relaunch.windowDetails', {
-    position: mainWindow.getPosition(),
-    size: mainWindow.getSize()
-  });
-  // Close App
-  mainWindow.close();
   // Tell app we are going to relaunch
   app.relaunch();
   // Kill Electron to initiate the relaunch
   app.quit();
-});
-
-// Dialog box asking if user really wants to restart app
-// Emitted from certain menu items that require an Electron restart
-app.on('restart-confirm', () => {
-  dialog.showMessageBox(mainWindow, {
-    'type': 'question',
-    'title': 'Restart Confirmation',
-    'message': 'Are you sure you want to restart the app?',
-    'buttons': [
-      'Yes',
-      'No'
-    ]
-  })
-  // Dialog returns a promise so let's handle it correctly
-  .then((result) => {
-    // Bail if the user pressed "No" or escaped (ESC) from the dialog box
-    if (result.response !== 0) { return; }
-    // Testing.
-    if (result.response === 0) {
-      //console.log('The "Yes" button was pressed (main process)');
-      //app.relaunch();
-      //app.quit();
-      app.emit('restart');
-    }
-  })
 });
 
 // Quit when all windows are closed.

@@ -1,14 +1,11 @@
+const { app } = require('electron');
 const path = require('path');
-const data = require(path.join(__dirname, '../package.json'));
-
-// Globally export what OS we are on
-const isLinux = process.platform === 'linux';
+const data = require(path.join(__dirname, '/package.json'));
 const isWin = process.platform === 'win32';
-const isMac = process.platform === 'darwin';
 
 module.exports = {
-  appName: data.productName,
-  appVersion: data.version,
+  appName: app.getName(),
+  appVersion: app.getVersion(),
   appDescription: data.description,
   copyrightInfo: data.copyright,
   author: data.author,
