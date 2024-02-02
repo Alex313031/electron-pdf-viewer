@@ -1,0 +1,81 @@
+{
+  "electronVersion": "22.3.27",
+  "asar": true,
+  "productName": "Electron PDF Viewer",
+  "appId": "com.alex313031.electron-pdf-viewer",
+  "copyright": "Copyright © 2024 Alex313031",
+  "generateUpdatesFilesForAllChannels": false,
+  "directories": {
+      "app": "app",
+      "buildResources": "build",
+      "output": "dist"
+  },
+  "files": [ "**/*" ],
+  "extraFiles": [
+    {
+      "from": "assets/icon.png"
+    },
+    {
+      "from": "assets/README.txt"
+    }
+  ],
+  "linux": {
+    "target": [
+      "zip",
+      "deb",
+      "appimage"
+    ],
+    "icon": "build/icons",
+    "maintainer": "Alex313031",
+    "vendor": "Alex313031",
+    "synopsis": "Electron based PDF Viewer.",
+    "category": "Media;",
+    "executableName": "electron-pdf-viewer",
+    "artifactName": "electron-pdf-viewer_${version}_${arch}.${ext}",
+    "desktop": {
+      "Name": "Electron PDF Viewer",
+      "StartupWMClass": "electron-pdf-viewer",
+      "Keywords": "electron;pdf;",
+      "Icon": "electron-pdf-viewer"
+    }
+  },
+  "win": {
+    "icon": "build/icon.ico",
+    "target": [
+      "zip",
+      "portable",
+      "nsis"
+    ],
+    "publisherName": "Alex313031",
+    "executableName": "electron_pdf_viewer",
+    "artifactName": "electron-pdf-viewer_win64_${version}_${arch}.${ext}"
+  },
+  "nsis": {
+    "shortcutName": "Electron PDF Viewer",
+    "artifactName": "electron-pdf-viewer_setup_${version}_${arch}.${ext}",
+    "uninstallDisplayName": "Electron PDF Viewer ${version}",
+    "deleteAppDataOnUninstall": true,
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true
+  },
+  "portable": {
+    "artifactName": "electron-pdf-viewer_portable_win64_${version}_${arch}.${ext}"
+  },
+  "mac": {
+    "category": "public.app-category.utilities",
+    "icon": "build/icon.icns",
+    "darkModeSupport": true,
+    "artifactName": "electron-pdf-viewer_${version}_macos_${arch}.${ext}",
+    "target": [
+      "dmg",
+      "zip"
+    ]
+  },
+  "fileAssociations": {
+    "ext": "pdf",
+    "name": "PDF",
+    "description": "Printable Document Format",
+    "mimeType": "application/pdf",
+    "role": "Viewer"
+  }
+}
