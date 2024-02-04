@@ -380,14 +380,20 @@ ipcMain.on('ipc-open-file', () => {
 function handleOpenFile() {
   var windowToLoad = BrowserWindow.getFocusedWindow();
   let path = dialog.showOpenDialogSync({
-    filters: [{ name: 'PDF', extensions: ['pdf'] }],
+    filters: [
+      { name: 'Document Files', extensions: ['pdf', 'txt', 'md'] }
+    ],
     properties: ['openFile']
   });
   if (path) {
     if (path.constructor === Array) {
       path = path[0];
       filePath = path;
-      windowToLoad.loadURL('file://' + __dirname + '/pdfviewer/web/viewer.html?file=' + encodeURIComponent(filePath), options);
+      if (path.includes('.txt') || path.includes('.md')) {
+        windowToLoad.loadURL('file://' + filePath, options);
+      } else {
+        windowToLoad.loadURL('file://' + __dirname + '/pdfviewer/web/viewer.html?file=' + encodeURIComponent(filePath), options);
+      }
       electronLog.info('Opened file: ' + filePath);
     }
   }
@@ -400,7 +406,7 @@ app.commandLine.appendSwitch('enable-ui-devtools');
 app.commandLine.appendSwitch('ignore-gpu-blocklist');
 app.commandLine.appendSwitch('enable-gpu-rasterization');
 app.commandLine.appendSwitch('enable-features', 'CSSColorSchemeUARendering,ImpulseScrollAnimations,ParallelDownloading,Portals,StorageBuckets,JXL');
-// Enable remote debugging only if we in development mode
+// Enable remote debugging only if we are in development mode
 if (process.env.NODE_ENV === 'development') {
   const portNumber = '9222'
   app.commandLine.appendSwitch('remote-debugging-port', portNumber);
