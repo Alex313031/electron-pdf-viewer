@@ -21,6 +21,14 @@ module.exports = (store, mainWindow, app) => {
       role: 'fileMenu',
       submenu: [
         {
+          label: 'Main Menu',
+          accelerator: 'CmdorCtrl+Alt+M',
+          click(item, focusedWindow) {
+            if (focusedWindow) focusedWindow.loadURL('file://' + __dirname + '/index.html', options);
+            electronLog.info('Opening Main Menu');
+          }
+        },
+        {
           label: 'Go Back',
           accelerator: 'Alt+Left',
           click(item, focusedWindow) {
@@ -233,7 +241,7 @@ module.exports = (store, mainWindow, app) => {
         },
         {
           label: 'Open chrome://process-internals',
-          accelerator: 'CmdorCtrl+Alt+P',
+          accelerator: 'CmdorCtrl+Alt+Shift+P',
           click() {
             const procsWindow = new BrowserWindow({ width: 900, height: 700, useContentSize: true, title: 'Process Model Internals' });
             procsWindow.loadURL('chrome://process-internals');
@@ -242,7 +250,7 @@ module.exports = (store, mainWindow, app) => {
         },
         {
           label: 'Open chrome://media-internals',
-          accelerator: 'CmdorCtrl+Alt+M',
+          accelerator: 'CmdorCtrl+Alt+Shift+M',
           click() {
             const mediaWindow = new BrowserWindow({ width: 900, height: 700, useContentSize: true, title: 'Media Internals' });
             mediaWindow.loadURL('chrome://media-internals');

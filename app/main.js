@@ -284,47 +284,70 @@ contextMenu({
   showSearchWithGoogle: true,
   prepend: (defaultActions, parameters) => [
   {
-    label: 'Open Video in New Window',
-    // Only show it when right-clicking video
-    visible: parameters.mediaType === 'video',
-    click: () => {
-      const newWin = new BrowserWindow({
-      title: 'New Window',
-      width: 1024,
-      height: 768,
-      useContentSize: true,
-      darkTheme: true,
-      webPreferences: {
-        nodeIntegration: false,
-        nodeIntegrationInWorker: false,
-        experimentalFeatures: true,
-        devTools: true
-      }
-      });
-      const vidURL = parameters.srcURL;
-      newWin.loadURL(vidURL);
-    }
-  },
-  {
     label: 'Open Link in New Window',
     // Only show it when right-clicking a link
     visible: parameters.linkURL.trim().length > 0,
     click: () => {
-      const newWin = new BrowserWindow({
-      title: 'New Window',
-      width: 1024,
-      height: 768,
-      useContentSize: true,
-      darkTheme: true,
-      webPreferences: {
-        nodeIntegration: false,
-        nodeIntegrationInWorker: false,
-        experimentalFeatures: true,
-        devTools: true
-      }
-      });
       const toURL = parameters.linkURL;
-      newWin.loadURL(toURL);
+      const linkWin = new BrowserWindow({
+        title: 'New Window',
+        width: 1024,
+        height: 700,
+        useContentSize: true,
+        darkTheme: true,
+        webPreferences: {
+          nodeIntegration: false,
+          nodeIntegrationInWorker: false,
+          experimentalFeatures: true,
+          devTools: true
+        }
+      });
+      linkWin.loadURL(toURL);
+      electronLog.info('Opened Link in New Window');
+    }
+  },
+  {
+    label: 'Open Image in New Window',
+    // Only show it when right-clicking an image
+    visible: parameters.mediaType === 'image',
+    click: () => {
+      const imgURL = parameters.srcURL;
+      const imgTitle = imgURL.substring(imgURL.lastIndexOf('/') + 1);
+      const imgWin = new BrowserWindow({
+        title: imgTitle,
+        useContentSize: true,
+        darkTheme: true,
+        webPreferences: {
+          nodeIntegration: false,
+          nodeIntegrationInWorker: false,
+          experimentalFeatures: true,
+          devTools: true
+        }
+      });
+      imgWin.loadURL(imgURL);
+      electronLog.info('Opened Image in New Window');
+    }
+  },
+  {
+    label: 'Open Video in New Window',
+    // Only show it when right-clicking a video
+    visible: parameters.mediaType === 'video',
+    click: () => {
+      const vidURL = parameters.srcURL;
+      const vidTitle = vidURL.substring(vidURL.lastIndexOf('/') + 1);
+      const vidWin = new BrowserWindow({
+        title: vidTitle,
+        useContentSize: true,
+        darkTheme: true,
+        webPreferences: {
+          nodeIntegration: false,
+          nodeIntegrationInWorker: false,
+          experimentalFeatures: true,
+          devTools: true
+        }
+      });
+      vidWin.loadURL(vidURL);
+      electronLog.info('Popped out Video');
     }
   }]
 });
@@ -351,6 +374,7 @@ ipcMain.on('ipc-open-file', () => {
 });
 
 function handleOpenFile() {
+  var windowToLoad = BrowserWindow.getFocusedWindow();
   let path = dialog.showOpenDialogSync({
     filters: [{ name: 'PDF', extensions: ['pdf'] }],
     properties: ['openFile']
@@ -359,7 +383,7 @@ function handleOpenFile() {
     if (path.constructor === Array) {
       path = path[0];
       filePath = path;
-      mainWindow.loadURL('file://' + __dirname + '/pdfviewer/web/viewer.html?file=' + encodeURIComponent(filePath), options);
+      windowToLoad.loadURL('file://' + __dirname + '/pdfviewer/web/viewer.html?file=' + encodeURIComponent(filePath), options);
       electronLog.info('Opened file: ' + filePath);
     }
   }
@@ -460,8 +484,8 @@ app.whenReady().then(async() => {
       app.dock.setIcon(appIcon);
       app.dock.setMenu(trayMenu);
     }
-    // hide splash screen randomly after ~1 seconds
-    setTimeout(createMainWindow, (Math.random() + 2) * 500);
+    // hide splash screen randomly after ~0.8 seconds
+    setTimeout(createMainWindow, (Math.random() + 2) * 400);
   }
 });
 

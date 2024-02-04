@@ -9,17 +9,23 @@ html {
 body {
   margin: auto;
   align-content: center;
-  background-color: #eee;
+  background-color: #2A2A2E;
   font-family: Roboto, sans-serif;
 }
 
 h2 {
   text-align: center;
-  color: #262626;
+  color: #F9F9FA;
+  filter: drop-shadow(1px 1px 1px #ab5fc7);
+}
+
+hr {
+  width: 100%;
+  border: 1px solid #F9F9FA;
 }
 
 img.shadow {
-  filter: drop-shadow(1px 1px 1px #262626);
+  filter: drop-shadow(1px 1px 1px #111);
 }
 
 .outer {
