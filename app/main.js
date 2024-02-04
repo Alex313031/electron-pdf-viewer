@@ -1,4 +1,4 @@
-const { app, BrowserWindow, crashReporter, Menu, Tray, shell, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, crashReporter, Menu, nativeTheme, Tray, shell, ipcMain, dialog } = require('electron');
 const config = require('./config');
 const path = require('path');
 const contextMenu = require('electron-context-menu');
@@ -159,6 +159,8 @@ async function createMainWindow() {
   mainWindow.setOverlayIcon(appIcon, appName);
   resetWindow(mainWindow);
 
+  nativeTheme.themeSource = 'dark';
+
   mainWindow.on('close', () => {
     mainWindow.webContents.clearHistory();
     if (mainWindow) {
@@ -241,6 +243,8 @@ async function createNewWindow() {
   });
   //newWindow.setOverlayIcon(appIcon, appName);
   resetWindow(newWindow);
+
+  nativeTheme.themeSource = 'dark';
 
   const windowDetails = store.get('windowDetails');
   if (windowDetails) {

@@ -259,6 +259,7 @@ module.exports = (store, mainWindow, app) => {
         },
         {
           label: 'Restart App',
+          accelerator: 'CmdorCtrl+Alt+Shift+R',
           click() {
             app.emit('restart');
           }
