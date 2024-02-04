@@ -5,7 +5,7 @@
     <title>Electron PDF Viewer</title>
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; img-src 'self' https: data: http:;"
+      content="default-src 'self' 'unsafe-inline'; img-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https: data: http:;"
     />
     <link rel="stylesheet" href="./css/index.css">
   </head>
@@ -14,6 +14,9 @@
       <div class="middle">
         <div class="inner">
         <h2>Electron PDF Viewer</h2>
+        <hr>
+        <button id="open-file-button" title="Open File" onclick="ipc.send('ipc-open-file')">Open File</button>
+        <br>
         <img title="Logo" class="shadow" src='icon256.png' width='128' height='128'>
         </div>
       </div>

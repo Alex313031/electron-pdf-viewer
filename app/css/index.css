@@ -8,7 +8,8 @@ html {
 
 body {
   margin: auto;
-  background-color: #ddd;
+  align-content: center;
+  background-color: #eee;
   font-family: Roboto, sans-serif;
 }
 
@@ -23,9 +24,11 @@ img.shadow {
 
 .outer {
   display: table;
-  position: absolute;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
   height: 90%;
-  width: 98%;
+  width: 90%;
 }
 
 .middle {
@@ -38,6 +41,23 @@ img.shadow {
   margin-right: auto;
   text-align: center;
   width: 100%;
+}
+
+/* Rounded Dark/Light Mode Button */
+button {
+  font-family: inherit;
+  box-shadow: 1px 1px 1px 0 #222;
+  border: 1px solid #000;
+  border-radius: 5px;
+  background-color: #AAA;
+  color: #000;
+}
+button:hover {
+  background-color: #CCC;
+}
+button:active {
+  box-shadow: 1px 1px 1px 0 #222 inset;
+  background-color: #BBB;
 }
 
 ::-webkit-scrollbar {

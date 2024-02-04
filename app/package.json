@@ -2,7 +2,7 @@
   "name": "electron-pdf-viewer",
   "productName": "Electron PDF Viewer",
   "applicationId": "com.alex313031.electron-pdf-viewer",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "A PDF viewer built with Electron",
   "main": "./main.js",
   "engines": {
@@ -42,7 +42,7 @@
   "dependencies": {
     "@electron/remote": "2.1.2",
     "electron-context-menu": "3.6.1",
-    "electron-log": "5.1.0",
+    "electron-log": "5.1.1",
     "electron-store": "8.1.0"
   },
   "devDependencies": {

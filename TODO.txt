@@ -1,8 +1,6 @@
 ----TODO----
 
- - Add open file button to renderer
  - New Icon
  - Possibly rebrand
  - Tweak CSS
- - Add dark mode/light mode setting
  - Add remember last PDF setting

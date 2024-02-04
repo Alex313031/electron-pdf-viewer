@@ -1,6 +1,8 @@
 const remote = require('@electron/remote');
 const Os = require('os');
 
+global.ipc = require('electron').ipcRenderer;
+
 // Globally export what OS we are on
 const isLinux = process.platform === 'linux';
 const isWin = process.platform === 'win32';

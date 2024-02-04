@@ -1,5 +1,6 @@
-const { app, BrowserWindow, crashReporter, Menu, Tray, shell, dialog } = require('electron');
+const { app, BrowserWindow, crashReporter, Menu, Tray, shell, ipcMain, dialog } = require('electron');
 const config = require('./config');
+const path = require('path');
 const contextMenu = require('electron-context-menu');
 const electronLog = require('electron-log');
 const Store = require('electron-store');
@@ -7,9 +8,12 @@ const options = { extraHeaders: 'pragma: no-cache\n' };
 const appIcon = config.iconPath;
 const trayIcon = config.trayIconPath;
 const argsCmd = process.argv;
+const argsCmd2 = process.argv[2];
 const menu = require('./menu.js');
 const store = new Store();
 let mainWindow;
+let newWindow;
+let showSplash;
 let splashWindow;
 let trayMenu = null;
 let filePath = null;
@@ -21,6 +25,7 @@ const electronVer = process.versions.electron;
 const chromeVer = process.versions.chrome;
 const nodeVer = process.versions.node;
 const v8Ver = process.versions.v8;
+const pdfjsVer = "4.0.379";
 
 // Initialize Electron remote module
 require('@electron/remote/main').initialize();
@@ -77,7 +82,7 @@ function forceSingleInstance() {
   }
 }
 
-function showSplashWindow() {
+async function showSplashWindow() {
   splashWindow = new BrowserWindow({
     accessibleTitle: appName,
     title: appName,
@@ -122,7 +127,7 @@ function hideSplashWindow() {
   splashWindow = null;
 }
 
-function createMainWindow() {
+async function createMainWindow() {
   // Create the main window.
   mainWindow = new BrowserWindow({
     accessibleTitle: appName,
@@ -142,12 +147,13 @@ function createMainWindow() {
     webPreferences: {
       nodeIntegration: false,
       nodeIntegrationInWorker: false,
-      contextIsolation: true,
+      contextIsolation: false,
       sandbox: false,
       experimentalFeatures: true,
       webviewTag: true,
       devTools: true,
-      defaultEncoding: 'UTF-8'
+      defaultEncoding: 'UTF-8',
+      preload: path.join(__dirname, 'preload.js')
     }
   });
   mainWindow.setOverlayIcon(appIcon, appName);
@@ -192,9 +198,74 @@ function createMainWindow() {
   require('@electron/remote/main').enable(mainWindow.webContents);
 
   mainWindow.once('ready-to-show', () => {
-    hideSplashWindow();
-    mainWindow.show();
-    mainWindow.focus();
+    if (showSplash == false) {
+      electronLog.info('Not showing splashWindow');
+      mainWindow.show();
+      mainWindow.focus();
+    } else {
+      hideSplashWindow();
+      mainWindow.show();
+      mainWindow.focus();
+    }
+  });
+}
+
+async function createNewWindow() {
+  // Create a new window.
+  newWindow = new BrowserWindow({
+    accessibleTitle: appName,
+    title: appName + ' (New Instance)',
+    icon: appIcon,
+    resizable: true,
+    maximizable: true,
+    minWidth: 400,
+    minHeight: 300,
+    width: 1024,
+    height: 800,
+    useContentSize: true,
+    autoHideMenuBar: false,
+    darkTheme: true,
+    show: false,
+    toolbar: true,
+    webPreferences: {
+      nodeIntegration: false,
+      nodeIntegrationInWorker: false,
+      contextIsolation: false,
+      sandbox: false,
+      experimentalFeatures: true,
+      webviewTag: true,
+      devTools: true,
+      defaultEncoding: 'UTF-8',
+      preload: path.join(__dirname, 'preload.js')
+    }
+  });
+  //newWindow.setOverlayIcon(appIcon, appName);
+  resetWindow(newWindow);
+
+  const windowDetails = store.get('windowDetails');
+  if (windowDetails) {
+    newWindow.setSize(
+      windowDetails.size[0],
+      windowDetails.size[1]
+    );
+    newWindow.setPosition(
+      windowDetails.position[0],
+      windowDetails.position[1]
+    );
+  } else {
+    newWindow.setSize(1024, 800);
+  }
+
+  newWindow.on('closed', () => {
+    newWindow = null;
+  });
+
+  newWindow.loadURL('file://' + __dirname + '/index.html', options);
+  require('@electron/remote/main').enable(newWindow.webContents);
+
+  newWindow.once('ready-to-show', () => {
+    newWindow.show();
+    newWindow.focus();
   });
 }
 
@@ -258,12 +329,24 @@ contextMenu({
   }]
 });
 
+app.on('new-window', () => {
+  createNewWindow();
+  electronLog.info('Created new BrowserWindow');
+  newWindow.webContents.once('dom-ready', () => {
+      newWindow.setTitle(appName + ' (New Instance)');
+  });
+});
+
 app.on('handle-open-file-path', () => {
   shell.showItemInFolder(filePath);
   electronLog.info('Opened containing filepath of: ' + filePath);
 });
 
 app.on('handle-open-file', () => {
+  handleOpenFile();
+});
+
+ipcMain.on('ipc-open-file', () => {
   handleOpenFile();
 });
 
@@ -300,7 +383,7 @@ const trayMenuTemplate = [
   { label: 'Minimize',
     type: 'radio',
     role: 'minimize',
-    click(item) {
+    click() {
       mainWindow.minimize();
       electronLog.info('Minimized mainWindow');
     }
@@ -308,7 +391,7 @@ const trayMenuTemplate = [
   { label: 'Restore',
     type: 'radio',
     role: 'restore',
-    click(item) {
+    click() {
       mainWindow.restore();
       electronLog.info('Restored mainWindow');
     }
@@ -328,10 +411,44 @@ app.whenReady().then(async() => {
     console.log('  Electron Version: ' + electronVer);
     console.log('  Chromium Version: ' + chromeVer);
     console.log('  NodeJS Version: ' + nodeVer);
-    console.log('  V8 Version: ' + v8Ver + '\n');
+    console.log('  V8 Version: ' + v8Ver);
+    console.log('  PDF.js Version: ' + pdfjsVer + '\n');
     app.quit();
+  } else if (argsCmd.includes('--file')) {
+    electronLog.info('Welcome to ' + appName);
+    showSplash = false;
+    let tray = new Tray(trayIcon);
+    trayMenu = Menu.buildFromTemplate(trayMenuTemplate);
+    tray.setToolTip(appName);
+    tray.setContextMenu(trayMenu);
+    Menu.setApplicationMenu(menu(store, mainWindow, app));
+    // for MacOS
+    if (app.dock) {
+      app.dock.setIcon(appIcon);
+      app.dock.setMenu(trayMenu);
+    }
+
+    // For the --file cmdline flag
+    let openNewFile;
+    let openNewFileUrI;
+    if (argsCmd2) {
+      openNewFileUrI = argsCmd2;
+    }
+    // Get the URI specified at the cmdline
+    openNewFile = path.resolve(openNewFileUrI);
+
+    createMainWindow();
+    mainWindow.loadURL('file://' + openNewFile, options);
+    // Load the URI specified at the cmdline
+    if (openNewFile !== undefined) {
+      if (openNewFile) {
+        mainWindow.loadURL('file://' + openNewFile, options);
+        electronLog.info('Note: Opening file specified on commandline at ' + [ openNewFileUrI ]);
+      }
+    }
   } else {
     electronLog.info('Welcome to ' + appName);
+    showSplash = true;
     showSplashWindow();
     let tray = new Tray(trayIcon);
     trayMenu = Menu.buildFromTemplate(trayMenuTemplate);
@@ -343,8 +460,8 @@ app.whenReady().then(async() => {
       app.dock.setIcon(appIcon);
       app.dock.setMenu(trayMenu);
     }
-    // hide splash screen randomly after ~1.2 seconds
-    setTimeout(createMainWindow, (Math.random() + 2) * 600);
+    // hide splash screen randomly after ~1 seconds
+    setTimeout(createMainWindow, (Math.random() + 2) * 500);
   }
 });
 

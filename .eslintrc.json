@@ -9,7 +9,7 @@
     "parserOptions": {
         "ecmaVersion": "2020"
     },
-    "ignorePatterns": [ "package.json", "package-lock.json", ".eslintrc.json" ],
+    "ignorePatterns": [ "package.json", "package-lock.json", ".eslintrc.json", "pdfviewer" ],
     "rules": {
         "no-redeclare": [ "warn" ]
     }
