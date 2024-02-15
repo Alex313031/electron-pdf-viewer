@@ -84,7 +84,7 @@ function forceSingleInstance() {
 
 async function showSplashWindow() {
   splashWindow = new BrowserWindow({
-    accessibleTitle: appName,
+    //accessibleTitle: appName,
     title: appName,
     icon: appIcon,
     width: 400,
@@ -130,7 +130,7 @@ function hideSplashWindow() {
 async function createMainWindow() {
   // Create the main window.
   mainWindow = new BrowserWindow({
-    accessibleTitle: appName,
+    //accessibleTitle: appName,
     title: appName,
     icon: appIcon,
     resizable: true,
@@ -215,7 +215,7 @@ async function createMainWindow() {
 async function createNewWindow() {
   // Create a new window.
   newWindow = new BrowserWindow({
-    accessibleTitle: appName,
+    //accessibleTitle: appName,
     title: appName + ' (New Instance)',
     icon: appIcon,
     resizable: true,
@@ -394,6 +394,8 @@ function handleOpenFile() {
       } else {
         windowToLoad.loadURL('file://' + __dirname + '/pdfviewer/web/viewer.html?file=' + encodeURIComponent(filePath), options);
       }
+      let filePathTitle = filePath.substring(filePath.lastIndexOf('/') + 1);
+      windowToLoad.setTitle(filePathTitle);
       electronLog.info('Opened file: ' + filePath);
     }
   }

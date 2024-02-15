@@ -28,7 +28,7 @@
     "icon": "build/icons",
     "maintainer": "Alex313031",
     "vendor": "Alex313031",
-    "synopsis": "Electron based PDF Viewer.",
+    "synopsis": "Electron based PDF Viewer built with PDF.js.",
     "category": "Media;",
     "executableName": "electron-pdf-viewer",
     "artifactName": "electron-pdf-viewer_${version}_${arch}.${ext}",

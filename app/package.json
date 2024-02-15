@@ -2,8 +2,8 @@
   "name": "electron-pdf-viewer",
   "productName": "Electron PDF Viewer",
   "applicationId": "com.alex313031.electron-pdf-viewer",
-  "version": "1.2.1",
-  "description": "A PDF viewer built with Electron",
+  "version": "1.2.2",
+  "description": "A PDF viewer built with Electron and PDF.js",
   "main": "./main.js",
   "engines": {
     "node": ">=14"
@@ -13,32 +13,21 @@
     "clean": "rimraf node_modules/",
     "burn": "rimraf package-lock.json"
   },
+  "author": "Alex313031 <alex313031@gmail.com>",
+  "license": "MIT",
+  "copyright": "Copyright © 2024 Alex313031",
+  "website": "https://thorium.rocks",
+  "homepage": "https://github.com/Alex313031/electron-pdf-viewer#readme",
   "repository": "https://github.com/Alex313031/electron-pdf-viewer",
+  "bugs": {
+    "url": "https://github.com/Alex313031/electron-pdf-viewer/issues"
+  },
   "keywords": [
     "Electron",
     "PDF",
     "viewer",
     "PDF.js"
   ],
-  "author": "Alex313031 <alex313031@gmail.com>",
-  "website": "https://thorium.rocks",
-  "homepage": "https://github.com/Alex313031/electron-pdf-viewer#readme",
-  "bugs": {
-    "url": "https://github.com/Alex313031/electron-pdf-viewer/issues"
-  },
-  "license": "MIT",
-  "copyright": "Copyright © 2024 Alex313031",
-  "devDependencies": {
-    "asar": "3.2.0",
-    "cross-env": "7.0.3",
-    "electron": "22.3.27",
-    "electron-builder": "23.6.0",
-    "eslint": "8.44.0",
-    "minimist": "1.2.8",
-    "normalize-url": "8.0.0",
-    "stylelint": "14.16.1",
-    "stylelint-config-standard": "29.0.0"
-  },
   "dependencies": {
     "@electron/remote": "2.1.2",
     "electron-context-menu": "3.6.1",
