@@ -10,6 +10,7 @@ const trayIcon = config.trayIconPath;
 const argsCmd = process.argv;
 const argsCmd2 = process.argv[2];
 const menu = require('./menu.js');
+const pdfData = require('./lib/version.json');
 const store = new Store();
 let mainWindow;
 let newWindow;
@@ -25,7 +26,7 @@ const electronVer = process.versions.electron;
 const chromeVer = process.versions.chrome;
 const nodeVer = process.versions.node;
 const v8Ver = process.versions.v8;
-const pdfjsVer = "4.0.379";
+const pdfJsVer = pdfData.version;
 
 // Initialize Electron remote module
 require('@electron/remote/main').initialize();
@@ -392,7 +393,7 @@ function handleOpenFile() {
       if (path.includes('.txt') || path.includes('.md')) {
         windowToLoad.loadURL('file://' + filePath, options);
       } else {
-        windowToLoad.loadURL('file://' + __dirname + '/pdfviewer/web/viewer.html?file=' + encodeURIComponent(filePath), options);
+        windowToLoad.loadURL('file://' + __dirname + '/lib/web/viewer.html?file=' + encodeURIComponent(filePath), options);
       }
       let filePathTitle = filePath.substring(filePath.lastIndexOf('/') + 1);
       windowToLoad.setTitle(filePathTitle);
@@ -448,10 +449,10 @@ app.whenReady().then(async() => {
     console.log('  Chromium Version: ' + chromeVer);
     console.log('  NodeJS Version: ' + nodeVer);
     console.log('  V8 Version: ' + v8Ver);
-    console.log('  PDF.js Version: ' + pdfjsVer + '\n');
+    console.log('  PDF.js Version: ' + pdfJsVer + '\n');
     app.quit();
   } else if (argsCmd.includes('--file')) {
-    electronLog.info('Welcome to ' + appName);
+    electronLog.info('Loading File supplied to --file');
     showSplash = false;
     let tray = new Tray(trayIcon);
     trayMenu = Menu.buildFromTemplate(trayMenuTemplate);
@@ -483,7 +484,12 @@ app.whenReady().then(async() => {
       }
     }
   } else {
-    electronLog.info('Welcome to ' + appName);
+    electronLog.info('Welcome to ' + appName + ' v.' + appVersion);
+    electronLog.info('Electron Version: ' + electronVer);
+    electronLog.info('Chromium Version: ' + chromeVer);
+    electronLog.info('NodeJS Version: ' + nodeVer);
+    electronLog.info('V8 Version: ' + v8Ver);
+    electronLog.info('PDF.js Version: ' + pdfJsVer + '\n');
     showSplash = true;
     showSplashWindow();
     let tray = new Tray(trayIcon);

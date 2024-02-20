@@ -1,5 +1,6 @@
 const remote = require('@electron/remote');
 const Os = require('os');
+const pdfData = require('./lib/version.json');
 
 global.ipc = require('electron').ipcRenderer;
 
@@ -35,14 +36,17 @@ if (isLinux) {
 }
 const archType = Os.arch();
 
+// Get PDF.js Version
+const pdfJsVer = pdfData.version;
+
 // Show app version in about.html
 window.addEventListener('DOMContentLoaded', () => {
   const replaceText = (selector, text) => {
     const element = document.getElementById(selector);
     if (element) element.innerText = text
   };
-
   replaceText('app-version', appVersion);
   replaceText('os-type', osType);
   replaceText('arch-type', archType);
+  replaceText('pdf-version', pdfJsVer);
 });
