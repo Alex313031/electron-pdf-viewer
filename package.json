@@ -14,7 +14,7 @@
     "build": "electron-builder --dir",
     "dist": "electron-builder",
     "distclean": "rimraf dist",
-    "clean": "rimraf dist/ && rimraf test/ && rimraf app/node_modules/ && rimraf node_modules/",
+    "clean": "rimraf dist/ && rimraf test/ && rimraf app/node_modules/ && rimraf node_modules/ && cd ./pdf.js && npm run clean",
     "burn": "rimraf package-lock.json && rimraf app/package-lock.json",
     "test": "npm run eslint ; npm run stylelint",
     "lint": "npm run eslint ; npm run stylelint",

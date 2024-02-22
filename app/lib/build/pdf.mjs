@@ -2801,7 +2801,7 @@ function getDocument(src) {
   }
   const fetchDocParams = {
     docId,
-    apiVersion: "4.1.215",
+    apiVersion: "4.1.221",
     data,
     password,
     disableAutoFetch,
@@ -4539,8 +4539,8 @@ class InternalRenderTask {
     }
   }
 }
-const version = "4.1.215";
-const build = "5382dcc20";
+const version = "4.1.221";
+const build = "9a87d4c45";
 
 __webpack_async_result__();
 } catch(e) { __webpack_async_result__(e); } });
@@ -10486,6 +10486,32 @@ class StampEditor extends editor_editor.AnnotationEditor {
     canvas.width = width;
     canvas.height = height;
     const bitmap = this.#isSvg ? this.#bitmap : this.#scaleBitmap(width, height);
+    if (this._uiManager.hasMLManager && !this.hasAltText()) {
+      const offscreen = new OffscreenCanvas(width, height);
+      const ctx = offscreen.getContext("2d");
+      ctx.drawImage(bitmap, 0, 0, bitmap.width, bitmap.height, 0, 0, width, height);
+      offscreen.convertToBlob().then(blob => {
+        const fileReader = new FileReader();
+        fileReader.onload = () => {
+          const url = fileReader.result;
+          this._uiManager.mlGuess({
+            service: "image-to-text",
+            request: {
+              imageData: url
+            }
+          }).then(response => {
+            const altText = response?.output || "";
+            if (this.parent && altText && !this.hasAltText()) {
+              this.altTextData = {
+                altText,
+                decorative: false
+              };
+            }
+          });
+        };
+        fileReader.readAsDataURL(blob);
+      });
+    }
     const ctx = canvas.getContext("2d");
     ctx.filter = this._uiManager.hcmFilter;
     ctx.drawImage(bitmap, 0, 0, bitmap.width, bitmap.height, 0, 0, width, height);
@@ -10674,8 +10700,9 @@ class AnnotationEditorLayer {
       case util.AnnotationEditorType.NONE:
         this.disableTextSelection();
         this.togglePointerEvents(false);
+        this.toggleAnnotationLayerPointerEvents(true);
         this.disableClick();
-        break;
+        return;
       case util.AnnotationEditorType.INK:
         this.addInkEditorIfNeeded(false);
         this.disableTextSelection();
@@ -10692,15 +10719,14 @@ class AnnotationEditorLayer {
         this.togglePointerEvents(true);
         this.enableClick();
     }
-    if (mode !== util.AnnotationEditorType.NONE) {
-      const {
-        classList
-      } = this.div;
-      for (const editorType of AnnotationEditorLayer.#editorTypes.values()) {
-        classList.toggle(`${editorType._type}Editing`, mode === editorType._editorType);
-      }
-      this.div.hidden = false;
+    this.toggleAnnotationLayerPointerEvents(false);
+    const {
+      classList
+    } = this.div;
+    for (const editorType of AnnotationEditorLayer.#editorTypes.values()) {
+      classList.toggle(`${editorType._type}Editing`, mode === editorType._editorType);
     }
+    this.div.hidden = false;
   }
   addInkEditorIfNeeded(isCommitting) {
     if (this.#uiManager.getMode() !== util.AnnotationEditorType.INK) {
@@ -10728,6 +10754,9 @@ class AnnotationEditorLayer {
   }
   togglePointerEvents(enabled = false) {
     this.div.classList.toggle("disabled", !enabled);
+  }
+  toggleAnnotationLayerPointerEvents(enabled = false) {
+    this.#annotationLayer?.div.classList.toggle("disabled", !enabled);
   }
   enable() {
     this.togglePointerEvents(true);
@@ -10794,6 +10823,7 @@ class AnnotationEditorLayer {
       classList.remove(`${editorType._type}Editing`);
     }
     this.disableTextSelection();
+    this.toggleAnnotationLayerPointerEvents(true);
     this.#isDisabling = false;
   }
   getEditableAnnotation(id) {
@@ -11523,6 +11553,9 @@ class AltText {
       focusVisible: this.#altTextWasFromKeyBoard
     });
     this.#altTextWasFromKeyBoard = false;
+  }
+  isEmpty() {
+    return !this.#altText && !this.#altTextDecorative;
   }
   get data() {
     return {
@@ -12330,6 +12363,9 @@ class AnnotationEditor {
       return;
     }
     this.#altText.data = data;
+  }
+  hasAltText() {
+    return !this.#altText?.isEmpty();
   }
   render() {
     this.div = document.createElement("div");
@@ -13700,6 +13736,7 @@ class AnnotationEditorUIManager {
   #isWaiting = false;
   #lastActiveElement = null;
   #mainHighlightColorPicker = null;
+  #mlManager = null;
   #mode = _shared_util_js__WEBPACK_IMPORTED_MODULE_0__.AnnotationEditorType.NONE;
   #selectedEditors = new Set();
   #pageColors = null;
@@ -13783,7 +13820,7 @@ class AnnotationEditorUIManager {
       checker: arrowChecker
     }]]));
   }
-  constructor(container, viewer, altTextManager, eventBus, pdfDocument, pageColors, highlightColors) {
+  constructor(container, viewer, altTextManager, eventBus, pdfDocument, pageColors, highlightColors, mlManager) {
     this.#container = container;
     this.#viewer = viewer;
     this.#altTextManager = altTextManager;
@@ -13796,6 +13833,7 @@ class AnnotationEditorUIManager {
     this.#filterFactory = pdfDocument.filterFactory;
     this.#pageColors = pageColors;
     this.#highlightColors = highlightColors || null;
+    this.#mlManager = mlManager || null;
     this.viewParameters = {
       realScale: _display_utils_js__WEBPACK_IMPORTED_MODULE_1__.PixelsPerInch.PDF_TO_CSS_UNITS,
       rotation: 0
@@ -13827,6 +13865,12 @@ class AnnotationEditorUIManager {
       clearTimeout(this.#translationTimeoutId);
       this.#translationTimeoutId = null;
     }
+  }
+  async mlGuess(data) {
+    return this.#mlManager?.guess(data) || null;
+  }
+  get hasMLManager() {
+    return !!this.#mlManager;
   }
   get hcmFilter() {
     return (0,_shared_util_js__WEBPACK_IMPORTED_MODULE_0__.shadow)(this, "hcmFilter", this.#pageColors ? this.#filterFactory.addHCMFilter(this.#pageColors.foreground, this.#pageColors.background) : "none");
@@ -17416,8 +17460,8 @@ _display_api_js__WEBPACK_IMPORTED_MODULE_1__ = (__webpack_async_dependencies__.t
 
 
 
-const pdfjsVersion = "4.1.215";
-const pdfjsBuild = "5382dcc20";
+const pdfjsVersion = "4.1.221";
+const pdfjsBuild = "9a87d4c45";
 
 __webpack_async_result__();
 } catch(e) { __webpack_async_result__(e); } });

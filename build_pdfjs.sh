@@ -20,8 +20,9 @@ displayHelp () {
 	printf "\n" &&
 	printf "${bold}${GRE}Script to build PDF.js.${c0}\n" &&
 	printf "${underline}${YEL}Usage:${c0} build.sh --build | --dist${c0}\n" &&
-	printf "--dist will copy the built files into ./app/lib${c0}\n" &&
-	printf "--help will show this help${c0}\n" &&
+	printf "The --build flag will build PDF.js${c0}\n" &&
+	printf "The --dist flag will build and copy the built files into ./app/lib${c0}\n" &&
+	printf "The --help flag will show this help${c0}\n" &&
 	printf "\n"
 }
 case $1 in
@@ -33,7 +34,13 @@ buildPDFjs () {
 	printf "${bold}${GRE}Building PDF.js...${c0}\n" &&
 	printf "\n" &&
 
-	
+	cd ./pdf.js &&
+	npm install &&
+	npm run build &&
+
+	printf "\n" &&
+	printf "${bold}${GRE}Done!${c0}\n" &&
+	printf "\n"
 }
 case $1 in
 	--build) buildPDFjs; exit 0;;
@@ -46,7 +53,14 @@ distPDFjs () {
 
 	cd ./pdf.js &&
 	npm install &&
-	npm run build
+	npm run build &&
+	cd .. &&
+
+	cp -r -v ./pdf.js/build/generic/. ./app/lib/ &&
+
+	printf "\n" &&
+	printf "${bold}${GRE}Done!${c0}\n" &&
+	printf "\n"
 }
 case $1 in
 	--dist) distPDFjs; exit 0;;
@@ -55,7 +69,8 @@ esac
 printf "\n" &&
 printf "${bold}${GRE}Script to build PDF.js.${c0}\n" &&
 printf "${underline}${YEL}Usage:${c0} build.sh --build | --dist${c0}\n" &&
-printf "--dist will copy the built files into ./app/lib${c0}\n" &&
-printf "--help will show this help${c0}\n" &&
+printf "The --build flag will build PDF.js${c0}\n" &&
+printf "The --dist flag will build and copy the built files into ./app/lib${c0}\n" &&
+printf "The --help flag will show this help${c0}\n" &&
 printf "\n" &&
 tput sgr0
