@@ -1,0 +1,3 @@
+[submodule "pdf.js"]
+	path = pdf.js
+	url = https://github.com/Alex313031/pdf.js.git
