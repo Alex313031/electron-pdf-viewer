@@ -7,7 +7,7 @@
   "generateUpdatesFilesForAllChannels": false,
   "directories": {
       "app": "app",
-      "buildResources": "build",
+      "buildResources": "resources",
       "output": "dist"
   },
   "files": [ "**/*" ],
