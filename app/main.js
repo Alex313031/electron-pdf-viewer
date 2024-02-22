@@ -1,4 +1,4 @@
-const { app, BrowserWindow, crashReporter, Menu, nativeTheme, Tray, shell, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, crashReporter, Menu, nativeTheme, session, Tray, shell, ipcMain, dialog } = require('electron');
 const config = require('./config');
 const path = require('path');
 const contextMenu = require('electron-context-menu');
@@ -382,7 +382,7 @@ function handleOpenFile() {
   var windowToLoad = BrowserWindow.getFocusedWindow();
   let path = dialog.showOpenDialogSync({
     filters: [
-      { name: 'Document Files', extensions: ['pdf', 'txt', 'md'] }
+      { name: 'Document Files', extensions: [ 'conf', 'doc', 'ini', 'log', 'md', 'pdf', 'rc' ] }
     ],
     properties: ['openFile']
   });
@@ -390,10 +390,15 @@ function handleOpenFile() {
     if (path.constructor === Array) {
       path = path[0];
       filePath = path;
-      if (path.includes('.txt') || path.includes('.md')) {
-        windowToLoad.loadURL('file://' + filePath, options);
-      } else {
+      if (path.includes('.pdf')) {
         windowToLoad.loadURL('file://' + __dirname + '/lib/web/viewer.html?file=' + encodeURIComponent(filePath), options);
+      } else {
+        windowToLoad.webContents.loadURL('file://' + filePath, options);
+        // Prevent Electron from trying to download files with unrecognized file extensions
+        windowToLoad.webContents.session.on('will-download', (event, downloadItem, webContents) => {
+          event.preventDefault();
+          windowToLoad.webContents.loadURL('file://' + filePath, options);
+        });
       }
       let filePathTitle = filePath.substring(filePath.lastIndexOf('/') + 1);
       windowToLoad.setTitle(filePathTitle);
@@ -489,7 +494,7 @@ app.whenReady().then(async() => {
     electronLog.info('Chromium Version: ' + chromeVer);
     electronLog.info('NodeJS Version: ' + nodeVer);
     electronLog.info('V8 Version: ' + v8Ver);
-    electronLog.info('PDF.js Version: ' + pdfJsVer + '\n');
+    electronLog.info('PDF.js Version: ' + pdfJsVer);
     showSplash = true;
     showSplashWindow();
     let tray = new Tray(trayIcon);
@@ -541,5 +546,5 @@ function rejectEvent(event) {
   event.preventDefault();
 }
 
-/* Restrict certain Electron APIs in the renderer process for security */
+// Restrict certain Electron APIs in the renderer process for security
 app.on('remote-require', rejectEvent);
