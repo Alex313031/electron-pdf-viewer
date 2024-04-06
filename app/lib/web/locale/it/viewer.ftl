@@ -307,6 +307,12 @@ pdfjs-editor-stamp-button-label = Aggiungi o rimuovi immagine
 pdfjs-editor-highlight-button =
     .title = Evidenzia
 pdfjs-editor-highlight-button-label = Evidenzia
+pdfjs-highlight-floating-button =
+    .title = Evidenzia
+pdfjs-highlight-floating-button1 =
+    .title = Evidenzia
+    .aria-label = Evidenzia
+pdfjs-highlight-floating-button-label = Evidenzia
 
 ## Remove button for the various kind of editor.
 
@@ -321,8 +327,6 @@ pdfjs-editor-remove-highlight-button =
 
 ##
 
-pdfjs-editor-remove-button =
-    .title = Rimuovi
 # Editor Parameters
 pdfjs-editor-free-text-color-input = Colore
 pdfjs-editor-free-text-size-input = Dimensione
@@ -394,3 +398,10 @@ pdfjs-editor-colorpicker-pink =
     .title = Rosa
 pdfjs-editor-colorpicker-red =
     .title = Rosso
+
+## Show all highlights
+## This is a toggle button to show/hide all the highlights.
+
+pdfjs-editor-highlight-show-all-button-label = Mostra tutto
+pdfjs-editor-highlight-show-all-button =
+    .title = Mostra tutto

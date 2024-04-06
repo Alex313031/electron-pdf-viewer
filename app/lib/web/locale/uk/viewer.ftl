@@ -288,7 +288,7 @@ pdfjs-text-annotation-type =
 
 pdfjs-password-label = Введіть пароль для відкриття цього PDF-файла.
 pdfjs-password-invalid = Невірний пароль. Спробуйте ще.
-pdfjs-password-ok-button = Гаразд
+pdfjs-password-ok-button = OK
 pdfjs-password-cancel-button = Скасувати
 pdfjs-web-fonts-disabled = Веб-шрифти вимкнено: неможливо використати вбудовані у PDF шрифти.
 
@@ -306,6 +306,12 @@ pdfjs-editor-stamp-button-label = Додати чи редагувати зоб�
 pdfjs-editor-highlight-button =
     .title = Підсвітити
 pdfjs-editor-highlight-button-label = Підсвітити
+pdfjs-highlight-floating-button =
+    .title = Підсвітити
+pdfjs-highlight-floating-button1 =
+    .title = Підсвітити
+    .aria-label = Підсвітити
+pdfjs-highlight-floating-button-label = Підсвітити
 
 ## Remove button for the various kind of editor.
 
@@ -389,3 +395,10 @@ pdfjs-editor-colorpicker-pink =
     .title = Рожевий
 pdfjs-editor-colorpicker-red =
     .title = Червоний
+
+## Show all highlights
+## This is a toggle button to show/hide all the highlights.
+
+pdfjs-editor-highlight-show-all-button-label = Показати все
+pdfjs-editor-highlight-show-all-button =
+    .title = Показати все
