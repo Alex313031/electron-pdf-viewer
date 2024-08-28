@@ -285,17 +285,32 @@ module.exports = (store, mainWindow, app) => {
           }
         },
         {
+          label: 'View Humans.txt',
+          accelerator: 'CmdorCtrl+Alt+H',
+          click() {
+            const humansWindow = new BrowserWindow({
+              width: 532,
+              height: 532,
+              useContentSize: true,
+              autoHideMenuBar: true,
+              title: 'humans.txt'
+            });
+            humansWindow.loadFile(path.join(__dirname, 'humans.txt'));
+            electronLog.info('Opened humans.txt :)');
+          }
+        },
+        {
           label: 'View License',
           accelerator: 'CmdorCtrl+Alt+L',
           click() {
             const licenseWindow = new BrowserWindow({
               width: 532,
-              height: 550,
+              height: 548,
               useContentSize: true,
               autoHideMenuBar: true,
               title: 'License'
             });
-            licenseWindow.loadURL('file://' + __dirname + '/license.md', options);
+            licenseWindow.loadFile(path.join(__dirname, 'license.md'));
             electronLog.info('Opened license.md');
           }
         },
@@ -305,7 +320,7 @@ module.exports = (store, mainWindow, app) => {
           click() {
             const aboutWindow = new BrowserWindow({
               width: 500,
-              height: 420,
+              height: 432,
               useContentSize: true,
               autoHideMenuBar: true,
               skipTaskbar: true,

@@ -51,12 +51,6 @@ pdfjs-download-button-label = Sækja
 pdfjs-bookmark-button =
     .title = Núverandi síða (Skoða vefslóð frá núverandi síðu)
 pdfjs-bookmark-button-label = Núverandi síða
-# Used in Firefox for Android.
-pdfjs-open-in-app-button =
-    .title = Opna í smáforriti
-# Used in Firefox for Android.
-# Length of the translation matters since we are in a mobile context, with limited screen estate.
-pdfjs-open-in-app-button-label = Opna í smáforriti
 
 ##  Secondary toolbar and context menu
 
@@ -284,7 +278,7 @@ pdfjs-text-annotation-type =
 
 ## Password
 
-pdfjs-password-label = Sláðu inn lykilorð til að opna þessa PDF skrá.
+pdfjs-password-label = Settu inn lykilorð til að opna þessa PDF-skrá.
 pdfjs-password-invalid = Ógilt lykilorð. Reyndu aftur.
 pdfjs-password-ok-button = Í lagi
 pdfjs-password-cancel-button = Hætta við
@@ -304,8 +298,6 @@ pdfjs-editor-stamp-button-label = Bæta við eða breyta myndum
 pdfjs-editor-highlight-button =
     .title = Áherslulita
 pdfjs-editor-highlight-button-label = Áherslulita
-pdfjs-highlight-floating-button =
-    .title = Áherslulita
 pdfjs-highlight-floating-button1 =
     .title = Áherslulita
     .aria-label = Áherslulita
@@ -400,3 +392,21 @@ pdfjs-editor-colorpicker-red =
 pdfjs-editor-highlight-show-all-button-label = Birta allt
 pdfjs-editor-highlight-show-all-button =
     .title = Birta allt
+
+## New alt-text dialog
+## Group note for entire feature: Alternative text (alt text) helps when people can't see the image. This feature includes a tool to create alt text automatically using an AI model that works locally on the user's device to preserve privacy.
+
+pdfjs-editor-new-alt-text-disclaimer-learn-more-url = Kanna nánar
+pdfjs-editor-new-alt-text-not-now-button = Ekki núna
+pdfjs-editor-new-alt-text-error-close-button = Loka
+# "Created automatically" is a prefix that will be added to the beginning of any alt text that has been automatically generated. After the colon, the user will see/hear the actual alt text description. If the alt text has been edited by a human, this prefix will not appear.
+# Variables:
+#   $generatedAltText (String) - the generated alt-text.
+pdfjs-editor-new-alt-text-generated-alt-text-with-disclaimer = Útbúið sjálfvirkt: { $generatedAltText }
+
+## Image alt-text settings
+
+pdfjs-editor-alt-text-settings-delete-model-button = Eyða
+pdfjs-editor-alt-text-settings-download-model-button = Sækja
+pdfjs-editor-alt-text-settings-downloading-model-button = Sæki…
+pdfjs-editor-alt-text-settings-close-button = Loka
