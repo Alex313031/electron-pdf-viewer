@@ -5,6 +5,7 @@ const electronLog = require('electron-log');
 const options = { extraHeaders: 'pragma: no-cache\n' };
 // Export app info
 const appName = app.getName();
+const appVersion = app.getVersion();
 const userHome = app.getPath('home');
 const userDataDir = app.getPath('userData');
 const userLogFile = path.join(userDataDir, 'logs/main.log');
@@ -278,12 +279,37 @@ module.exports = (store, mainWindow, app) => {
       label: 'About',
       role: 'help',
       submenu: [
+        { label: appName + ' v' + appVersion, enabled: false },
+        { type: 'separator' },
+        {
+          label: 'Created by Praharsh Jain &&',
+          click() {
+            const createdWindow = new BrowserWindow({ width: 1024, height: 768, useContentSize: true });
+            createdWindow.loadURL('https://github.com/praharshjain/Electron-PDF-Viewer#readme');
+          }
+        },
+        {
+          label: 'Maintained by Alex313031',
+          click() {
+            const maintainedWindow = new BrowserWindow({ width: 1024, height: 768, useContentSize: true });
+            maintainedWindow.loadURL('https://github.com/Alex313031/electron-pdf-viewer/releases');
+          }
+        },
+        { type: 'separator' },
+        {
+          label: 'Report an Issue',
+          click() {
+            shell.openExternal('https://github.com/Alex313031/electron-pdf-viewer/issues/new');
+            electronLog.info('Opened external browser');
+          }
+        },
         {
           label: 'Learn More',
           click() {
             new BrowserWindow({ width: 1024, height: 768, useContentSize: true }).loadURL('https://github.com/Alex313031/electron-pdf-viewer#readme');
           }
         },
+        { type: 'separator' },
         {
           label: 'View Humans.txt',
           accelerator: 'CmdorCtrl+Alt+H',
