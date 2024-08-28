@@ -37,7 +37,7 @@ buildPDFjs () {
 
 	cd ./pdf.js &&
 	npm install &&
-	npm run build &&
+	npm run build-legacy &&
 
 	printf "\n" &&
 	printf "${bold}${GRE}Done!${c0}\n" &&
@@ -54,11 +54,11 @@ distPDFjs () {
 
 	cd ./pdf.js &&
 	npm install &&
-	npm run build &&
+	npm run build-legacy &&
 	cd .. &&
 
 	rm -r -v -f ./app/lib/* &&
-	cp -r -v ./pdf.js/build/generic/. ./app/lib/ &&
+	cp -r -v ./pdf.js/build/generic-legacy/. ./app/lib/ &&
 
 	printf "\n" &&
 	printf "${bold}${GRE}Done!${c0}\n" &&
